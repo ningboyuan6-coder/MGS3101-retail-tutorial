@@ -67,3 +67,38 @@ def demo_pandas_fundamentals():
     print('2010-11:', retail_2010_11['Customer ID'].isna().sum())
 
     return retail_2009_10, retail_2010_11
+def clean_and_prepare_data(retail_2009_10, retail_2010_11):
+    print('\n--- Clean and prepare data ---')
+
+    retail = pd.concat(
+        [retail_2009_10, retail_2010_11],
+        ignore_index=True
+    )
+
+    retail.columns = (
+        retail.columns
+        .str.strip()
+        .str.replace(' ', '_')
+    )
+
+    retail['InvoiceDate'] = pd.to_datetime(retail['InvoiceDate'])
+
+    retail['Is_Cancelled'] = retail['Invoice'].astype(str).str.startswith('C')
+
+    print('Combined raw rows:', len(retail))
+    print('Cancellation/return rows:', retail['Is_Cancelled'].sum())
+
+    retail = retail[
+        (~retail['Is_Cancelled'])
+        & (retail['Quantity'] > 0)
+        & (retail['Price'] > 0)
+    ].copy()
+
+    retail['Is_Registered'] = retail['Customer_ID'].notna()
+
+    retail['Revenue'] = retail['Quantity'] * retail['Price']
+
+    print('Valid completed sales:', len(retail))
+    print('Net revenue:', retail['Revenue'].sum())
+
+    return retail
