@@ -102,3 +102,31 @@ def clean_and_prepare_data(retail_2009_10, retail_2010_11):
     print('Net revenue:', retail['Revenue'].sum())
 
     return retail
+def make_recommendations(retail):
+    print('\n--- Recommendations ---')
+
+    country_revenue = (
+        retail.groupby('Country')['Revenue']
+        .sum()
+        .sort_values(ascending=False)
+    )
+
+    product_revenue = (
+        retail.groupby('Description')['Revenue']
+        .sum()
+        .sort_values(ascending=False)
+    )
+
+    registered_revenue = (
+        retail.groupby('Is_Registered')['Revenue']
+        .sum()
+    )
+
+    print('Recommendation 1: Focus marketing on the highest-revenue countries.')
+    print(country_revenue.head(5))
+
+    print('\nRecommendation 2: Prioritize the highest-revenue products.')
+    print(product_revenue.head(10))
+
+    print('\nRecommendation 3: Compare registered vs. unregistered customer revenue.')
+    print(registered_revenue)
